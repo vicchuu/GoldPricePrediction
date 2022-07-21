@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+</head>
+<body>
+ <div class="login">
+	<h2>Predict of survival</h2>
+     <h5.>Please Enter your thought with Vishnu </h5.>
+     <!-- Main Input For Receiving Query to our ML      Pclass  Sex   Age  Ticket     Fare  Cabin -->
+    <form action="{{ url_for('predict')}}"method="post">
+<!--    	<input type="text" name="Pclass" placeholder="Ticket class" required maxlength="1" />-->
+<!--        <input type="text" name="Sex" placeholder="Sex" required maxlength="1" />-->
+<!--		<input type="text" name="Age" placeholder="Age" required="required" />-->
+<!--		<input type="text" name="Ticket" placeholder="Ticket no"  required maxlength="3" />-->
+<!-- 		<input type="text" name="Fare" placeholder="fare amount" required maxlength="2" />-->
+ 		<input type="text" name="Cabin" placeholder="What information you required" required="required" />
+
+        <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+    </form>
+
+   <br>
+   <br>
+   {{ prediction_text }}
+
+ </div>
+</body>
+</html>
