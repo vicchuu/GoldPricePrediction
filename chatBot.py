@@ -4,7 +4,9 @@ from flask import Flask ,render_template,request
 
 
 from flask_sqlalchemy import SQLAlchemy
-
+#
+# import nltk
+# nltk.download('punkt')
 # #connect to SQLite
 # con = sql.connect('db_web.db')
 #
@@ -21,11 +23,25 @@ from flask_sqlalchemy import SQLAlchemy
 # )'''
 # cur.execute(sql)
 chat = Flask(__name__)
-chat.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+chat.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vishnu.db'
 chat.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(chat)
 
+# db.session.query(db).delete()
+# db.session.commit()
 
+"""DB creation in terminal"""
+# >>> from chatBot import db
+# >>> db.create_all()
+# >>>
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.String(200) ,nullable =False)
+
+    def __repr__(self):
+        return '<Name %r>'% self.query
 
 
 from chatterbot.conversation import Statement
@@ -60,27 +76,38 @@ trainer.train("/Users/vishnubharathi/PycharmProjects/GoldPricePrediction/custom.
 
 
 @chat.route("/")
+@chat.route("/home")
 def index():
-    con = sql.connect("db_web.db", check_same_thread=False)
-    con.row_factory = sql.Row
-    cur = con.cursor()
-    cur.execute("select * from users")
-    data = cur.fetchall()
-    print("Date :",data)
-    return render_template("index.html", prediction_text=data)
+    User.query.delete()
+    data =User(question="Hi im alexa , how can i help ?")
+    db.session.add(data)
+    db.session.commit()
+    print("data.....",data)
+    all_orders = User.query.all()
+    return render_template("index.html",prediction_text=all_orders)
 
-@chat.route("/predict",methods=['POST'])
+@chat.route("/predict",methods=['POST','GET'])
 def predict():
 
-    userText = [str(x) for x in request.form.values()  ]
-    print("*************")
-    # for a in userText:
-    #     print("text--> ",a)
-    print(userText)
-    print( vichu.get_response(userText[0]))
-    response = vichu.get_response(Statement(text=userText[0],search_text=userText[0]))
-    print("R   :",response)
-    return render_template('index.html',prediction_text=' {}'.format(response))
+    if request.method=='POST':
+        userText = [str(x) for x in request.form.values()  ]
+        entr = User(question =userText[0])
+        db.session.add(entr)
+        #print("*************")
+        # for a in userText:
+        #     print("text--> ",a)
+        #print(userText)
+        #print( vichu.get_response(userText[0]))
+        response = vichu.get_response(Statement(text=userText[0],search_text=userText[0]))
+        res = User(question=response)
+        db.session.add(res)
+        #print("R   :",response)
+        db.session.commit()
+        return render_template('index.html',prediction_text=' {}'.format(response))
+    else:
+        return "hi under cinstructin"
+
+
 
 
 

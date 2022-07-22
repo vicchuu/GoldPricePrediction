@@ -27,7 +27,15 @@
 
    <br>
    <br>
-   {{ prediction_text }}
+         {% for task in prediction_text %}
+
+                <h5>{{ task.question }}</h5>
+
+
+        {% endfor %}
+
+
+<!--   {{ prediction_text }}-->
 
  </div>
 </body>
