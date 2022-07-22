@@ -59,12 +59,13 @@ import ssl
 #     ssl._create_default_https_context = _create_unverified_https_context
 #
 # nltk.download()
-vichu = ChatBot("vichu")
+vichu = ChatBot("vichu",logic_adapters = ["chatterbot.logic.MathematicalEvaluation"]  )
 
 trainer = ChatterBotCorpusTrainer(vichu)
 
 trainer.train("/Users/vishnubharathi/PycharmProjects/GoldPricePrediction/custom.yml")
 
+arithmethic = '+ ,*,/,-,%'
 # print("Hi i'm Vichu chat Bot ,")
 # while True:
 #
@@ -83,6 +84,7 @@ def index():
     db.session.add(data)
     db.session.commit()
     print("data.....",data)
+    #print("Arithmarhic ",(vichu.get_response(Statement(text="2+4",search_text="2+4"))))
     all_orders = User.query.all()
     return render_template("index.html",prediction_text=all_orders)
 
@@ -91,7 +93,10 @@ def predict():
 
     if request.method=='POST':
         userText = [str(x) for x in request.form.values()  ]
-        entr = User(question =userText[0])
+        ip = str(userText[0])
+
+
+        entr =( User(question =ip))
         db.session.add(entr)
         #print("*************")
         # for a in userText:
@@ -99,15 +104,28 @@ def predict():
         #print(userText)
         #print( vichu.get_response(userText[0]))
         response = vichu.get_response(Statement(text=userText[0],search_text=userText[0]))
-        res = User(question=response)
+        res = (User(question=str(response)))
         db.session.add(res)
         #print("R   :",response)
         db.session.commit()
-        return render_template('index.html',prediction_text=' {}'.format(response))
+        all_orders = User.query.all()
+        # for al in all_orders:
+        #     print(al.question)
+        return render_template('index.html',prediction_text=all_orders)
     else:
         return "hi under cinstructin"
 
 
+
+
+def retunnAnswer(s):
+    print (eval(s))
+    emp=""
+    for  e in s:
+        if  not e.isalpha():
+            emp.append(e)
+
+    print(emp)
 
 
 
