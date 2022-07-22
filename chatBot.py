@@ -59,7 +59,7 @@ import ssl
 #     ssl._create_default_https_context = _create_unverified_https_context
 #
 # nltk.download()
-vichu = ChatBot("vichu",logic_adapters = ["chatterbot.logic.MathematicalEvaluation"]  )
+vichu = ChatBot("vichu")
 
 trainer = ChatterBotCorpusTrainer(vichu)
 
@@ -91,41 +91,43 @@ def index():
 @chat.route("/predict",methods=['POST','GET'])
 def predict():
 
+
     if request.method=='POST':
         userText = [str(x) for x in request.form.values()  ]
         ip = str(userText[0])
+        entr = User(question=ip)
+        if ip.isidentifier():
 
 
-        entr =( User(question =ip))
+            #print("*************")
+            # for a in userText:
+            #     print("text--> ",a)
+            #print(userText)
+            #print( vichu.get_response(userText[0]))
+            response = vichu.get_response(Statement(text=userText[0],search_text=userText[0]))
+            res = User(question=str(response))
+        else:
+            res = User(question=str(retunnAnswer(ip)))
         db.session.add(entr)
-        #print("*************")
-        # for a in userText:
-        #     print("text--> ",a)
-        #print(userText)
-        #print( vichu.get_response(userText[0]))
-        response = vichu.get_response(Statement(text=userText[0],search_text=userText[0]))
-        res = (User(question=str(response)))
         db.session.add(res)
         #print("R   :",response)
         db.session.commit()
         all_orders = User.query.all()
-        # for al in all_orders:
-        #     print(al.question)
         return render_template('index.html',prediction_text=all_orders)
     else:
         return "hi under cinstructin"
 
 
 
-
 def retunnAnswer(s):
-    print (eval(s))
+    #print (eval(s))
     emp=""
     for  e in s:
-        if  not e.isalpha():
-            emp.append(e)
+        if  not e.isalpha() or e in arithmethic:
+            emp+=e
 
-    print(emp)
+    print("QQQQQQQQQ ",emp)
+    return eval(emp)
 
 
 
