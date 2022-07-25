@@ -1,8 +1,8 @@
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from flask import Flask ,render_template,request
-
-
+import  wikipedia as wkp
+import pywhatkit as kt
 from flask_sqlalchemy import SQLAlchemy
 #
 # import nltk
@@ -65,7 +65,7 @@ trainer = ChatterBotCorpusTrainer(vichu)
 
 trainer.train("/Users/vishnubharathi/PycharmProjects/GoldPricePrediction/custom.yml")
 
-arithmethic = '+ ,*,/,-,%'
+arithmethic = '+*,/-%'
 # print("Hi i'm Vichu chat Bot ,")
 # while True:
 #
@@ -74,8 +74,8 @@ arithmethic = '+ ,*,/,-,%'
 #         break
 #     print(vichu.get_response(Statement(text=text,search_text=text)))
 
-
-
+searchParam = ["search","google","find","check"]
+whatsappparam = ["whatsapp","whats","message"]
 @chat.route("/")
 @chat.route("/home")
 def index():
@@ -96,16 +96,34 @@ def predict():
         userText = [str(x) for x in request.form.values()  ]
         ip = str(userText[0])
         entr = User(question=ip)
-        if ip.isidentifier():
+        print("IP :",ip)
 
 
-            #print("*************")
-            # for a in userText:
-            #     print("text--> ",a)
-            #print(userText)
-            #print( vichu.get_response(userText[0]))
+
+        if checksearch(ip)==1 :
+            print("check Search")
+            print("Wiki :",wkp.search(ip))
+            result= kt.info(topic=str(ip),lines=1,return_value=True)
+            print(result,type(result))
+            res = User(question=str(result))
+            #return "ip contain check or search"
+        elif checkWhatsapp(ip)==1:
+            #whatsapp "hi hello " to 8124242715
+            print("check whatsapp")
+
+            try:
+                text,num = splitNoMessage(ip)
+                print(text,num)
+                kt.sendwhatmsg_instantly(phone_no=num,message=text)
+                res = User(question=str("Whatsapp message sent"))
+            except:
+                res = User(question=str("Please check the content and resend your whatsapp message"))
+                #return "input contains whatsapp message"
+        elif checkArith(ip)==0:
+            print("check arithmethic")
             response = vichu.get_response(Statement(text=userText[0],search_text=userText[0]))
             res = User(question=str(response))
+
         else:
             res = User(question=str(retunnAnswer(ip)))
         db.session.add(entr)
@@ -117,6 +135,50 @@ def predict():
     else:
         return "hi under cinstructin"
 
+def splitNoMessage(ip):
+    """args: input from the usert
+    #whatsapp "hi hello " to 8124242715
+
+    return --> seperate number and text
+     """
+    start =False
+    text = ""
+    num = ""
+    for a in ip:
+
+        if a =='"' :
+            if start==False:
+                start=True
+            else:
+                start=False
+        if start:
+            #print(a)
+            text+=(a)
+        if a.isdigit():
+            num+=(a)
+    print("text",text)
+    if len(num)==10:
+        num="+91"+num
+
+    return text[1:] , num
+
+
+
+def checkArith(ip):
+    for a in ip:
+        if a in arithmethic:
+            return 1
+    return 0
+def checksearch(ip):
+    for a in searchParam:
+        if a in ip:
+            return 1
+    return 0
+def checkWhatsapp(ip):
+    for a in whatsappparam:
+        if a in ip:
+            return 1
+    return 0
 
 
 def retunnAnswer(s):

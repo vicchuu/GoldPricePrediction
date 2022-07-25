@@ -11,8 +11,9 @@
 </head>
 <body>
  <div class="login">
-	<h2>Predict of survival</h2>
-     <h5.>Please Enter your thought with Vishnu </h5.>
+	<h2>Chatbot abput Vishnu</h2>
+     <h4>Please Enter your thought with Vishnu and you can </h4>
+     <h4> do web search  and send message through whatsapp</h4>
      <!-- Main Input For Receiving Query to our ML      Pclass  Sex   Age  Ticket     Fare  Cabin -->
     <form action="{{ url_for('predict')}}"method="post">
 <!--    	<input type="text" name="Pclass" placeholder="Ticket class" required maxlength="1" />-->
@@ -26,10 +27,10 @@
     </form>
 
    <br>
-<br>
+     <br>
          {% for task in prediction_text %}
 
-                <h5>{{ task.question }}</h5>
+                <h4>{{ task.question }}</h4>
 
         {% endfor %}
 
