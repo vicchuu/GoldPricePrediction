@@ -59,7 +59,7 @@ import matplotlib.pyplot as pt
 
 """Printing movies name , if movies rate more than 8.7"""
 
-rating =8
+#rating =8
 
 # ad = (movie_dataset_1.sort_values(by=movie_dataset_1["IMDb_rating"],ascending=True))
 #
@@ -133,12 +133,24 @@ def find_director_of_movie(dir_name):
     ans = movie_dataset_0[movie_dataset_0.directors == close]['id'].values[0]
     #    ans.append(imdb_index)
     ans=int(ans)
-    print("ans :",ans," Close :",close)
+    #print("ans :",ans," Close :",close)
     #getting similar types of movies
     #print("Simi :",sim)
     similarity_score = list(enumerate(cosine_similar[ans]))
-    print(similarity_score)
-    return ans
+    """need to sort similar movie title"""
+    sorted_Similar_movies = sorted(similarity_score, key=lambda x: x[1], reverse=True)
+    #print("sorted : ", sorted_Similar_movies[:10])
+    movie_name = []
+    for a in range(15):
+        ind = sorted_Similar_movies[a]
+        # print(type(ind[0]))
+        movies= movie_dataset_0[movie_dataset_0.id == ind[0]]['title'].values[0]
+        id = movie_dataset_0[movie_dataset_0.id == ind[0]]['IMDb_rating'].values[0]
+        desc = movie_dataset_0[movie_dataset_0.id == ind[0]]['description'].values[0]
+        movie_name.append((movies,id,desc[:60]))
+    movie_name = movie_name.sort(key= lambda x:x[1],reverse=True)
+    df = ps.DataFrame(movie_name)
+    return df
 
 def find_title_of_movie(tit_name):
     """args: movie title name
@@ -153,7 +165,7 @@ def find_title_of_movie(tit_name):
     ans = movie_dataset_0[movie_dataset_0.title == close]['id'].values[0]
     #    ans.append(imdb_index)
     ans=int(ans)
-    print("ans :",ans," Close :",close)
+    #print("ans :",ans," Close :",close)
     #getting similar types of movies
     similarity_score = list(enumerate(cosine_similar[ans]))
 
@@ -161,16 +173,22 @@ def find_title_of_movie(tit_name):
 
     """need to sort similar movie title"""
     sorted_Similar_movies = sorted(similarity_score,key= lambda x:x[1],reverse=True)
-    print("sorted : ",sorted_Similar_movies[:10])
-
+    #print("sorted : ",sorted_Similar_movies)
+    movie_name=[]
     for a in range (10):
-        ind = (sorted_Similar_movies[a])
-        print(type(ind) ,ind)
+        ind = sorted_Similar_movies[a]
+        #print(type(ind[0]))
+        movies = movie_dataset_0[movie_dataset_0.id == ind[0]]['title'].values[0]
+        id = movie_dataset_0[movie_dataset_0.id == ind[0]]['IMDb_rating'].values[0]
+        desc = movie_dataset_0[movie_dataset_0.id == ind[0]]['description'].values[0]
+        movie_name.append((movies, id, desc[:800]))
+    movie_name = sorted(movie_name,key=lambda x: x[1], reverse=True)
+    df = ps.DataFrame(movie_name)
+    return df
 
-        movie_name = movie_dataset_0[movie_dataset_0.id ==int(ind)]['title'].values[0]
-        print(movie_name)
-    return ans
 
-
-l = find_title_of_movie("spider man ")
-print(l)
+# l = find_title_of_movie("hulk")
+#
+# data_fram = ps.DataFrame(l)
+#
+# print(data_fram.head(5).to_string())

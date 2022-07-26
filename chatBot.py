@@ -3,6 +3,7 @@ from chatterbot.trainers import ChatterBotCorpusTrainer
 from flask import Flask ,render_template,request
 import  wikipedia as wkp
 import pywhatkit as kt
+import movieRecommend
 from flask_sqlalchemy import SQLAlchemy
 #
 # import nltk
@@ -86,6 +87,10 @@ def index():
     print("data.....",data)
     #print("Arithmarhic ",(vichu.get_response(Statement(text="2+4",search_text="2+4"))))
     all_orders = User.query.all()
+    # movie_name = "spider man "
+    # ms =movieRecommend
+    # data_frame = ms.find_title_of_movie(movie_name)
+    # print(data_frame.head(2))
     return render_template("index.html",prediction_text=all_orders)
 
 @chat.route("/predict",methods=['POST','GET'])
@@ -103,8 +108,12 @@ def predict():
         if checksearch(ip)==1 :
             print("check Search")
             print("Wiki :",wkp.search(ip))
-            result= kt.info(topic=str(ip),lines=1,return_value=True)
-            print(result,type(result))
+            try:
+
+                result= kt.info(topic=str(ip),lines=1,return_value=True)
+                print(result,type(result))
+            except:
+                result = "please enter valid search text"
             res = User(question=str(result))
             #return "ip contain check or search"
         elif checkWhatsapp(ip)==1:
